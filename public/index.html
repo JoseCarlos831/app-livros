@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Busca de Livros</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container my-5">
+    <h1 class="text-center text-primary mb-4">Busca de Livros</h1>
+    <input id="search" class="form-control mb-3" placeholder="Digite o título ou autor do livro">
+    <button id="search-button" class="btn btn-primary btn-block">Buscar</button>
+    <div id="books" class="mt-4"></div>
+  </div>
+
+  <script>
+    document.getElementById('search-button').addEventListener('click', async () => {
+      const query = document.getElementById('search').value;
+      const booksContainer = document.getElementById('books');
+      booksContainer.innerHTML = '';
+
+      try {
+        const response = await fetch(`/api/books?q=${query}`);
+        const books = await response.json();
+
+        books.forEach(book => {
+          const bookDiv = document.createElement('div');
+          bookDiv.className = "card mb-3";
+          bookDiv.innerHTML = `
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img src="${book.volumeInfo.imageLinks?.thumbnail || ''}" class="card-img" alt="Capa do livro">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">${book.volumeInfo.title}</h5>
+                  <p class="card-text">${book.volumeInfo.authors?.join(', ') || 'Autor desconhecido'}</p>
+                  <a href="book.html?id=${book.id}" class="btn btn-primary">Detalhes</a>
+                </div>
+              </div>
+            </div>
+          `;
+          booksContainer.appendChild(bookDiv);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar livros:', error);
+      }
+    });
+  </script>
+</body>
+</html>
